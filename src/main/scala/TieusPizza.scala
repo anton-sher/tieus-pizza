@@ -61,6 +61,7 @@ object TieusPizza {
     var totalWaitingTime: Long = 0
 
     servingOrder.foreach { customer =>
+      if (currentTime < input.timeOrdered(customer)) currentTime = input.timeOrdered(customer)
       currentTime += input.timeToCook(customer)
       val servingTime = currentTime
       totalWaitingTime += (servingTime - input.timeOrdered(customer))
