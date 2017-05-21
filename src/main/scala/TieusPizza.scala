@@ -33,6 +33,7 @@ object TieusPizza {
 
   def findServingOrder(input: ProblemInput): Seq[Int] = {
     val futureCustomers: ListBuffer[Int] = ListBuffer() ++ (0 until input.numberOfCustomers)
+    val futureCustomersTimeOrdered: ListBuffer[Long] = futureCustomers.map(input.timeOrdered(_))
     val currentWaitingCustomers: ListBuffer[Int] = ListBuffer()
     val servedCustomers: ListBuffer[Int] = ListBuffer()
 
@@ -44,7 +45,7 @@ object TieusPizza {
       }
 
       if (currentWaitingCustomers.isEmpty) {
-        currentTime += 1
+        currentTime = futureCustomersTimeOrdered.head
       } else {
         // if there are several customers waiting, one with the fastest pizza goes first. See README.md for proof.
         val nextCustomerToServe = currentWaitingCustomers.minBy(c => input.timeToCook(c))
