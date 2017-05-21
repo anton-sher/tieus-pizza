@@ -42,6 +42,7 @@ object TieusPizza {
     while (servedCustomers.size < input.numberOfCustomers) {
       while (futureCustomers.nonEmpty && input.timeOrdered(futureCustomers.head) <= currentTime) {
         currentWaitingCustomers += futureCustomers.remove(0)
+        futureCustomersTimeOrdered.remove(0)
       }
 
       if (currentWaitingCustomers.isEmpty) {
