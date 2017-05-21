@@ -1,3 +1,4 @@
+import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
 case class ProblemInput(numberOfCustomers: Int, timeOrdered: Array[Int], timeToCook: Array[Int]) {}
@@ -31,16 +32,16 @@ object TieusPizza {
   }
 
   def findServingOrder(input: ProblemInput): Seq[Int] = {
-    var currentWaitingCustomers: Seq[Int] = Seq()
-    var servedCustomers: Seq[Int] = Seq()
+    val futureCustomers: ListBuffer[Int] = ListBuffer() ++ (0 until input.numberOfCustomers)
+    val currentWaitingCustomers: ListBuffer[Int] = ListBuffer()
+    val servedCustomers: ListBuffer[Int] = ListBuffer()
 
     var currentTime = 0
 
     while (servedCustomers.size < input.numberOfCustomers) {
-      // TODO this isn't efficient
-      currentWaitingCustomers = (0 until input.numberOfCustomers)
-        .diff(servedCustomers)
-        .filter(c => input.timeOrdered(c) <= currentTime)
+      while (futureCustomers.nonEmpty && input.timeOrdered(futureCustomers.head) <= currentTime) {
+        currentWaitingCustomers += futureCustomers.remove(0)
+      }
 
       if (currentWaitingCustomers.isEmpty) {
         currentTime += 1
@@ -48,7 +49,8 @@ object TieusPizza {
         // if there are several customers waiting, one with the fastest pizza goes first. See README.md for proof.
         val nextCustomerToServe = currentWaitingCustomers.minBy(c => input.timeToCook(c))
         currentTime += input.timeToCook(nextCustomerToServe)
-        servedCustomers = servedCustomers ++ Seq(nextCustomerToServe)
+        servedCustomers += nextCustomerToServe
+        currentWaitingCustomers -= nextCustomerToServe
       }
     }
     servedCustomers
