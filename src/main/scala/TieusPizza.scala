@@ -1,7 +1,7 @@
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
-case class ProblemInput(numberOfCustomers: Int, timeOrdered: Array[Int], timeToCook: Array[Int]) {}
+case class ProblemInput(numberOfCustomers: Int, timeOrdered: Array[Long], timeToCook: Array[Long]) {}
 
 object TieusPizza {
   def main(args: Array[String]): Unit = {
@@ -17,7 +17,7 @@ object TieusPizza {
 
     val numberOfCustomers = lines.next().toInt
 
-    val parsedLines = lines.take(numberOfCustomers).map(_.split(" ").map(_.toInt)).toSeq
+    val parsedLines = lines.take(numberOfCustomers).map(_.split(" ").map(_.toLong)).toSeq
 
     val timeOrdered = parsedLines.map(_ (0))
     val timeToCook = parsedLines.map(_ (1))
@@ -25,7 +25,7 @@ object TieusPizza {
     ProblemInput(numberOfCustomers, timeOrdered.toArray, timeToCook.toArray)
   }
 
-  def solve(input: ProblemInput): Int = {
+  def solve(input: ProblemInput): Long = {
     val servedCustomers: Seq[Int] = findServingOrder(input)
 
     calculateAverageWaitingTime(input, servedCustomers)
@@ -36,7 +36,7 @@ object TieusPizza {
     val currentWaitingCustomers: ListBuffer[Int] = ListBuffer()
     val servedCustomers: ListBuffer[Int] = ListBuffer()
 
-    var currentTime = 0
+    var currentTime: Long = 0
 
     while (servedCustomers.size < input.numberOfCustomers) {
       while (futureCustomers.nonEmpty && input.timeOrdered(futureCustomers.head) <= currentTime) {
@@ -56,9 +56,9 @@ object TieusPizza {
     servedCustomers
   }
 
-  def calculateAverageWaitingTime(input: ProblemInput, servingOrder: Seq[Int]): Int = {
-    var currentTime = 0
-    var totalWaitingTime = 0
+  def calculateAverageWaitingTime(input: ProblemInput, servingOrder: Seq[Int]): Long = {
+    var currentTime: Long = 0
+    var totalWaitingTime: Long = 0
 
     servingOrder.foreach { customer =>
       currentTime += input.timeToCook(customer)
