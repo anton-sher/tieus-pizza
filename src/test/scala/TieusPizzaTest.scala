@@ -1,3 +1,5 @@
+import scala.util.Random
+
 class TieusPizzaTest extends org.scalatest.FunSuite {
   test("solve sample 00") {
     val input = Seq(CustomerOrder(0, 0, 3), CustomerOrder(1, 1, 9), CustomerOrder(2, 2, 6))
@@ -47,14 +49,27 @@ class TieusPizzaTest extends org.scalatest.FunSuite {
     assert(solution == 8)
   }
 
+  private val maximalTimeValue = 1000000000
+
   test("extreme values: everyone comes at the same time and has same cooking duration, maxed out") {
-    var nr = 0
     val numberOfCustomers = 100000
-    val input = Array.fill[CustomerOrder](numberOfCustomers){val o = CustomerOrder(nr, 1000000000, 1000000000); nr += 1; o}
+    val seqGen = (0 until numberOfCustomers).iterator
+    val input = Array.fill[CustomerOrder](numberOfCustomers){CustomerOrder(seqGen.next(), maximalTimeValue, maximalTimeValue)}
 
     val solution = TieusPizza.solve(input)
 
-    val expectedResult = 1000000000 * (1 to numberOfCustomers).map(_.toLong).sum / numberOfCustomers
+    val expectedResult = maximalTimeValue * (1 to numberOfCustomers).map(_.toLong).sum / numberOfCustomers
     assert(solution == expectedResult)
+  }
+
+  test("random input should not crash") {
+    val numberOfCustomers = 100000
+    val seqGen = (0 until numberOfCustomers).iterator
+    val incomingTime = Array.fill[Long](numberOfCustomers)(Random.nextInt(maximalTimeValue)).iterator
+    val input = Array.fill[CustomerOrder](numberOfCustomers){CustomerOrder(seqGen.next(), incomingTime.next(), Random.nextInt(maximalTimeValue))}
+
+    val solution = TieusPizza.solve(input)
+
+    assert(solution > 0)
   }
 }
