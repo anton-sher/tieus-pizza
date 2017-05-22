@@ -1,7 +1,7 @@
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
-case class CustomerOrder(sequenceNumber: Int, timeOrdered: Long, cookingDuration: Long) {}
+case class CustomerOrder(timeOrdered: Long, cookingDuration: Long) {}
 
 object TieusPizza {
   def main(args: Array[String]): Unit = {
@@ -19,9 +19,7 @@ object TieusPizza {
 
     val parsedLines = lines.take(numberOfCustomers).map(_.split(" ").map(_.toLong)).toSeq
 
-    parsedLines
-      .zip(0 until numberOfCustomers)
-      .map(line_number => CustomerOrder(line_number._2, line_number._1(0), line_number._1(1)))
+    parsedLines.map(parsed_line => CustomerOrder(parsed_line(0), parsed_line(1)))
   }
 
   def solve(input: Seq[CustomerOrder]): Long = {

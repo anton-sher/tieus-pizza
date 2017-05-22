@@ -17,6 +17,14 @@ This makes for a straightforward solution: simulate the serving, building the li
 selecting one that has fastest-cooking pizza every time. In the end, calculate total waiting time and divide by nubmer
 of customers.
 
+## Caveat
+
+To handle extreme cases, building a list of currently waiting customers must be done carefully. One such case is when
+all of them show up at same time, which is maximal allowed, and order pizzas with maximal allowed duration.
+
+To ensure high execution speed, list should be kept sorted. Picking the next customer means just taking the list head,
+this is constant time when using linked list. 
+
 ## Running the code
 
 You can use SBT like this:

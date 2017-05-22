@@ -2,7 +2,7 @@ import scala.util.Random
 
 class TieusPizzaTest extends org.scalatest.FunSuite {
   test("solve sample 00") {
-    val input = Seq(CustomerOrder(0, 0, 3), CustomerOrder(1, 1, 9), CustomerOrder(2, 2, 6))
+    val input = Seq(CustomerOrder(0, 3), CustomerOrder(1, 9), CustomerOrder(2, 6))
 
     val solution = TieusPizza.solve(input)
 
@@ -10,7 +10,7 @@ class TieusPizzaTest extends org.scalatest.FunSuite {
   }
 
   test("solve sample 01") {
-    val input = Seq(CustomerOrder(0, 0, 3), CustomerOrder(1, 1, 9), CustomerOrder(2, 2, 5))
+    val input = Seq(CustomerOrder(0, 3), CustomerOrder(1, 9), CustomerOrder(2, 5))
 
     val solution = TieusPizza.solve(input)
 
@@ -18,15 +18,15 @@ class TieusPizzaTest extends org.scalatest.FunSuite {
   }
 
   test("solving order in sample 01") {
-    val input = Seq(CustomerOrder(0, 0, 3), CustomerOrder(1, 1, 9), CustomerOrder(2, 2, 5))
+    val input = Seq(CustomerOrder(0, 3), CustomerOrder(1, 9), CustomerOrder(2, 5))
 
     val servingOrder = TieusPizza.findServingOrder(input)
 
-    assert(servingOrder.map(_.sequenceNumber) == Seq(0, 2, 1))
+    assert(servingOrder == Seq(CustomerOrder(0, 3), CustomerOrder(2, 5), CustomerOrder(1, 9)))
   }
 
   test("degenerate case") {
-    val input = Seq(CustomerOrder(0, 0, 10))
+    val input = Seq(CustomerOrder(1, 10))
 
     val solution = TieusPizza.solve(input)
 
@@ -34,7 +34,7 @@ class TieusPizzaTest extends org.scalatest.FunSuite {
   }
 
   test("ordering time with gaps 1") {
-    val input = Seq(CustomerOrder(0, 1, 1), CustomerOrder(1, 3, 1), CustomerOrder(2, 5, 1))
+    val input = Seq(CustomerOrder(1, 1), CustomerOrder(3, 1), CustomerOrder(5, 1))
 
     val solution = TieusPizza.solve(input)
 
@@ -42,7 +42,7 @@ class TieusPizzaTest extends org.scalatest.FunSuite {
   }
 
   test("ordering time with gaps 2") {
-    val input = Seq(CustomerOrder(0, 1, 4), CustomerOrder(1, 3, 8), CustomerOrder(2, 5, 6))
+    val input = Seq(CustomerOrder(1, 4), CustomerOrder(3, 8), CustomerOrder(5, 6))
 
     val solution = TieusPizza.solve(input)
 
@@ -53,8 +53,7 @@ class TieusPizzaTest extends org.scalatest.FunSuite {
 
   test("extreme values: everyone comes at the same time and has same cooking duration, maxed out") {
     val numberOfCustomers = 100000
-    val seqGen = (0 until numberOfCustomers).iterator
-    val input = Array.fill[CustomerOrder](numberOfCustomers){CustomerOrder(seqGen.next(), maximalTimeValue, maximalTimeValue)}
+    val input = Array.fill[CustomerOrder](numberOfCustomers){CustomerOrder(maximalTimeValue, maximalTimeValue)}
 
     val solution = TieusPizza.solve(input)
 
@@ -64,9 +63,8 @@ class TieusPizzaTest extends org.scalatest.FunSuite {
 
   test("random input should not crash") {
     val numberOfCustomers = 100000
-    val seqGen = (0 until numberOfCustomers).iterator
     val incomingTime = Array.fill[Long](numberOfCustomers)(Random.nextInt(maximalTimeValue)).iterator
-    val input = Array.fill[CustomerOrder](numberOfCustomers){CustomerOrder(seqGen.next(), incomingTime.next(), Random.nextInt(maximalTimeValue))}
+    val input = Array.fill[CustomerOrder](numberOfCustomers){CustomerOrder(incomingTime.next(), Random.nextInt(maximalTimeValue))}
 
     val solution = TieusPizza.solve(input)
 
