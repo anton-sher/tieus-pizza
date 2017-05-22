@@ -1,7 +1,7 @@
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
-case class ProblemInput(numberOfCustomers: Int, timeOrdered: Array[Long], timeToCook: Array[Long]) {}
+case class CustomerOrder(sequenceNumber: Int, timeOrdered: Long, cookingDuration: Long) {}
 
 object TieusPizza {
   def main(args: Array[String]): Unit = {
@@ -12,45 +12,42 @@ object TieusPizza {
     println(solve(input))
   }
 
-  def parseInput(inputFile: String): ProblemInput = {
+  def parseInput(inputFile: String): Seq[CustomerOrder] = {
     val lines = Source.fromFile(inputFile).getLines()
 
     val numberOfCustomers = lines.next().toInt
 
     val parsedLines = lines.take(numberOfCustomers).map(_.split(" ").map(_.toLong)).toSeq
 
-    val timeOrdered = parsedLines.map(_ (0))
-    val timeToCook = parsedLines.map(_ (1))
-
-    ProblemInput(numberOfCustomers, timeOrdered.toArray, timeToCook.toArray)
+    parsedLines
+      .zip(0 until numberOfCustomers)
+      .map(line_number => CustomerOrder(line_number._2, line_number._1(0), line_number._1(1)))
   }
 
-  def solve(input: ProblemInput): Long = {
-    val servedCustomers: Seq[Int] = findServingOrder(input)
+  def solve(input: Seq[CustomerOrder]): Long = {
+    val ordersAsServed: Seq[CustomerOrder] = findServingOrder(input)
 
-    calculateAverageWaitingTime(input, servedCustomers)
+    calculateAverageWaitingTime(ordersAsServed)
   }
 
-  def findServingOrder(input: ProblemInput): Seq[Int] = {
-    val futureCustomers: ListBuffer[Int] = ListBuffer() ++ (0 until input.numberOfCustomers)
-    val futureCustomersTimeOrdered: ListBuffer[Long] = futureCustomers.map(input.timeOrdered(_))
-    val currentWaitingCustomers: ListBuffer[Int] = ListBuffer()
-    val servedCustomers: ListBuffer[Int] = ListBuffer()
+  def findServingOrder(input: Seq[CustomerOrder]): Seq[CustomerOrder] = {
+    val futureCustomers: ListBuffer[CustomerOrder] = ListBuffer() ++ input
+    val currentWaitingCustomers: ListBuffer[CustomerOrder] = ListBuffer()
+    val servedCustomers: ListBuffer[CustomerOrder] = ListBuffer()
 
     var currentTime: Long = 0
 
-    while (servedCustomers.size < input.numberOfCustomers) {
-      while (futureCustomers.nonEmpty && input.timeOrdered(futureCustomers.head) <= currentTime) {
+    while (servedCustomers.size < input.size) {
+      while (futureCustomers.nonEmpty && futureCustomers.head.timeOrdered <= currentTime) {
         currentWaitingCustomers += futureCustomers.remove(0)
-        futureCustomersTimeOrdered.remove(0)
       }
 
       if (currentWaitingCustomers.isEmpty) {
-        currentTime = futureCustomersTimeOrdered.head
+        currentTime = futureCustomers.head.timeOrdered
       } else {
         // if there are several customers waiting, one with the fastest pizza goes first. See README.md for proof.
-        val nextCustomerToServe = currentWaitingCustomers.minBy(c => input.timeToCook(c))
-        currentTime += input.timeToCook(nextCustomerToServe)
+        val nextCustomerToServe = currentWaitingCustomers.minBy(_.cookingDuration)
+        currentTime += nextCustomerToServe.cookingDuration
         servedCustomers += nextCustomerToServe
         currentWaitingCustomers -= nextCustomerToServe
       }
@@ -58,17 +55,17 @@ object TieusPizza {
     servedCustomers
   }
 
-  def calculateAverageWaitingTime(input: ProblemInput, servingOrder: Seq[Int]): Long = {
+  def calculateAverageWaitingTime(ordersAsServed: Seq[CustomerOrder]): Long = {
     var currentTime: Long = 0
     var totalWaitingTime: Long = 0
 
-    servingOrder.foreach { customer =>
-      if (currentTime < input.timeOrdered(customer)) currentTime = input.timeOrdered(customer)
-      currentTime += input.timeToCook(customer)
+    ordersAsServed.foreach { order =>
+      if (currentTime < order.timeOrdered) currentTime = order.timeOrdered
+      currentTime += order.cookingDuration
       val servingTime = currentTime
-      totalWaitingTime += (servingTime - input.timeOrdered(customer))
+      totalWaitingTime += (servingTime - order.timeOrdered)
     }
 
-    totalWaitingTime / input.numberOfCustomers
+    totalWaitingTime / ordersAsServed.size
   }
 }
