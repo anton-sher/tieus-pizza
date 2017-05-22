@@ -47,12 +47,14 @@ class TieusPizzaTest extends org.scalatest.FunSuite {
     assert(solution == 8)
   }
 
-  ignore("extreme values") {
+  test("extreme values: everyone comes at the same time and has same cooking duration, maxed out") {
     var nr = 0
-    val input = Array.fill[CustomerOrder](100000){val o = CustomerOrder(nr, 1000000000, 1000000000); nr += 1; o}
+    val numberOfCustomers = 100000
+    val input = Array.fill[CustomerOrder](numberOfCustomers){val o = CustomerOrder(nr, 1000000000, 1000000000); nr += 1; o}
 
     val solution = TieusPizza.solve(input)
 
-    assert(solution == 1000000000)
+    val expectedResult = 1000000000 * (1 to numberOfCustomers).map(_.toLong).sum / numberOfCustomers
+    assert(solution == expectedResult)
   }
 }
