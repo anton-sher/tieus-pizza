@@ -1,3 +1,5 @@
+import java.io.{File, PrintStream}
+
 import scala.util.Random
 
 class TieusPizzaTest extends org.scalatest.FunSuite {
@@ -59,6 +61,23 @@ class TieusPizzaTest extends org.scalatest.FunSuite {
 
     val expectedResult = maximalTimeValue * (1 to numberOfCustomers).map(_.toLong).sum / numberOfCustomers
     assert(solution == expectedResult)
+  }
+
+  test("reading extreme values from a file shouldn't explode") {
+    val numberOfCustomers = 100000
+    val input = Array.fill[CustomerOrder](numberOfCustomers){CustomerOrder(maximalTimeValue, maximalTimeValue)}
+
+    val tempFile = File.createTempFile("test", "input")
+    tempFile.deleteOnExit()
+    val out = new PrintStream(tempFile)
+
+    out.println(numberOfCustomers)
+    input.foreach(co => out.println(co.timeOrdered + " " + co.cookingDuration))
+    out.close()
+
+    val fromFile = TieusPizza.parseInput(tempFile.getAbsolutePath)
+
+    assert(fromFile.toArray sameElements input)
   }
 
   test("random input should not crash") {
